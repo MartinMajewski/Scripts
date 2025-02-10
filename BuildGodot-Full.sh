@@ -29,11 +29,11 @@ fi
 ###################################################################################################
 # Ask the user if they want to build Godot with or without DotNet/Mono support
 echo ""
-echo "====================================================="
-echo "Do you want to build Godot with DotNet/Mono support?"
+echo "========================================================"
+echo "Do you want to build Godot with .Net aka. Mono support?"
 echo "1. Yes"
 echo "2. No"
-echo "====================================================="
+echo "========================================================"
 echo ""
 echo "Note: Building with DotNet/Mono support requires the Mono SDK to be installed."
 echo ""
@@ -56,11 +56,11 @@ fi
 
 # Ask the user if they want to use double or single precision
 echo ""
-echo "====================================================="
+echo "========================================================"
 echo "Do you want to use double or single precision?"
 echo "1. Double"
 echo "2. Single"
-echo "====================================================="
+echo "========================================================"
 echo ""
 read -p "Enter your choice (1 or 2): " precision_choice
 echo ""
@@ -68,9 +68,11 @@ echo ""
 # Set the PRECISION variable based on user input
 if [ "$precision_choice" -eq 1 ]; then
     PRECISION="double"
+    GODOT_APP_NAME="$GODOT_APP_NAME-DoublePrecision"
     echo "Using double precision."
 elif [ "$precision_choice" -eq 2 ]; then
     PRECISION="single"
+    GODOT_APP_NAME="$GODOT_APP_NAME-SinglePrecision"
     echo "Using single precision."
 else
     echo "Invalid choice. Exiting."
@@ -227,9 +229,10 @@ echo "$GODOT_APP_NAME packaged and signed successfully."
 echo ""
 # Check if a symbolic link to the created app exists inside MacOS' Application folder
 echo "-----------------------"
-APP_LINK="/Applications/$GODOT_APP_NAME-CustomBuild.app"
+FULL_GODOT_APP_NAME="$GODOT_APP_NAME-CustomBuild.app"
+APP_LINK="/Applications/$FULL_GODOT_APP_NAME"
 if [ ! -L "$APP_LINK" ]; then
-    echo "Creating symbolic link to $GODOT_APP_NAME.app in /Applications folder..."
+    echo "Creating symbolic link $FULL_GODOT_APP_NAME to $GODOT_APP_NAME.app in /Applications folder..."
     sudo ln -s "$(pwd)/$GODOT_APP_NAME.app" "$APP_LINK"
     check_error "Failed to create symbolic link in /Applications folder"
     echo "Symbolic link created successfully."
