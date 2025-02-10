@@ -4,7 +4,7 @@
 # Website: https://www.martinmajewski.net
 
 # Variables
-GODOT_NAME="Godot-Mono"
+GODOT_APP_NAME="Godot-Mono"
 DOUBLE_PRECISION=true
 
 # Function to check the last command status and exit if it failed
@@ -25,7 +25,7 @@ fi
 
 echo ""
 echo "#######################"
-echo "Building $GODOT_NAME for MacOS arm64 with .Net and Vulkan support..."
+echo "Building $GODOT_APP_NAME for MacOS arm64 with .Net and Vulkan support..."
 
 # echo ""
 # # Update and upgrade Homebrew
@@ -88,7 +88,7 @@ scons platform=macos target=template_release module_mono_enabled=yes
 check_error "Failed to build template_release"
 
 # Print compile completion message
-echo "$GODOT_NAME build for MacOS arm64 completed successfully."
+echo "$GODOT_APP_NAME build for MacOS arm64 completed successfully."
 
 echo ""
 # Generate Mono Glue
@@ -114,69 +114,69 @@ fi
 echo ""
 # Package the Godot engine for MacOS
 echo "-----------------------"
-echo "Packaging $GODOT_NAME for MacOS arm64..."
+echo "Packaging $GODOT_APP_NAME for MacOS arm64..."
 
-echo "Removing old $GODOT_NAME.app..."
-rm -rf $GODOT_NAME.app
-check_error "Failed to remove old $GODOT_NAME.app"
+echo "Removing old $GODOT_APP_NAME.app..."
+rm -rf $GODOT_APP_NAME.app
+check_error "Failed to remove old $GODOT_APP_NAME.app"
 
-echo "Copying macos_tools.app to $GODOT_NAME.app..."
-cp -r misc/dist/macos_tools.app ./$GODOT_NAME.app
+echo "Copying macos_tools.app to $GODOT_APP_NAME.app..."
+cp -r misc/dist/macos_tools.app ./$GODOT_APP_NAME.app
 check_error "Failed to copy macos_tools.app"
 
 echo "Creating Contents/MacOS directory..."
-mkdir -p $GODOT_NAME.app/Contents/MacOS
+mkdir -p $GODOT_APP_NAME.app/Contents/MacOS
 check_error "Failed to create Contents/MacOS directory"
 
-echo "Copying GodotSharp to $GODOT_NAME.app/Contents/Resources/..."
-cp -rp bin/GodotSharp $GODOT_NAME.app/Contents/Resources/
+echo "Copying GodotSharp to $GODOT_APP_NAME.app/Contents/Resources/..."
+cp -rp bin/GodotSharp $GODOT_APP_NAME.app/Contents/Resources/
 check_error "Failed to copy GodotSharp"
 
-echo "Copying GodotSharpAssemblies to $GODOT_NAME.app/Contents/MacOS/..."
+echo "Copying GodotSharpAssemblies to $GODOT_APP_NAME.app/Contents/MacOS/..."
 if [ "$DOUBLE_PRECISION" = true ]; then
-    cp bin/godot.macos.editor.double.arm64.mono $GODOT_NAME.app/Contents/MacOS/Godot
+    cp bin/godot.macos.editor.double.arm64.mono $GODOT_APP_NAME.app/Contents/MacOS/Godot
 else
-    cp bin/godot.macos.editor.arm64.mono $GODOT_NAME.app/Contents/MacOS/Godot
+    cp bin/godot.macos.editor.arm64.mono $GODOT_APP_NAME.app/Contents/MacOS/Godot
 fi
 check_error "Failed to copy GodotSharpAssemblies"
 
-echo "Changing permission to 755 for $GODOT_NAME..."
-chmod +x $GODOT_NAME.app/Contents/MacOS/Godot
+echo "Changing permission to 755 for $GODOT_APP_NAME..."
+chmod +x $GODOT_APP_NAME.app/Contents/MacOS/Godot
 
 # echo ""
 # # Copy MoltenVK library to the Godot.app
 # echo "-----------------------"
 # molten_vk_path=$(brew --cellar molten-vk)/$(brew info --json molten-vk | jq -r '.[0].installed[0].version')
-# echo "Copying MoltenVK library to $GODOT_NAME.app - using $molten_vk_path"
-# mkdir -p $GODOT_NAME.app/Contents/Frameworks
-# sudo cp $molten_vk_path/lib/libMoltenVK.dylib $GODOT_NAME.app/Contents/Frameworks/libMoltenVK.dylib
+# echo "Copying MoltenVK library to $GODOT_APP_NAME.app - using $molten_vk_path"
+# mkdir -p $GODOT_APP_NAME.app/Contents/Frameworks
+# sudo cp $molten_vk_path/lib/libMoltenVK.dylib $GODOT_APP_NAME.app/Contents/Frameworks/libMoltenVK.dylib
 # check_error "Failed to copy MoltenVK library"
 
 # echo ""
 # # Change permission to 755
 # echo "-----------------------"
-# echo "Current permission for libMoltenVK.dylib is: $(stat -f %A $GODOT_NAME.app/Contents/Frameworks/libMoltenVK.dylib)"
+# echo "Current permission for libMoltenVK.dylib is: $(stat -f %A $GODOT_APP_NAME.app/Contents/Frameworks/libMoltenVK.dylib)"
 # echo "Changing permission to 755 for libMoltenVK.dylib"
-# sudo chmod 755 $GODOT_NAME.app/Contents/Frameworks/libMoltenVK.dylib
+# sudo chmod 755 $GODOT_APP_NAME.app/Contents/Frameworks/libMoltenVK.dylib
 # check_error "Failed to change permission for libMoltenVK.dylib"
 
 echo ""
 # Sign the Godot app
 echo "-----------------------"
-echo "Signing $GODOT_NAME.app..."
-codesign --force --timestamp --options=runtime --entitlements misc/dist/macos/editor.entitlements -s - $GODOT_NAME.app
-check_error "Failed to sign $GODOT_NAME.app"
+echo "Signing $GODOT_APP_NAME.app..."
+codesign --force --timestamp --options=runtime --entitlements misc/dist/macos/editor.entitlements -s - $GODOT_APP_NAME.app
+check_error "Failed to sign $GODOT_APP_NAME.app"
 
 # Print packaging completion message
-echo "$GODOT_NAME packaged and signed successfully."
+echo "$GODOT_APP_NAME packaged and signed successfully."
 
 echo ""
 # Check if a symbolic link to the created app exists inside MacOS' Application folder
 echo "-----------------------"
-APP_LINK="/Applications/$GODOT_NAME-custom.app"
+APP_LINK="/Applications/$GODOT_APP_NAME-custom.app"
 if [ ! -L "$APP_LINK" ]; then
-    echo "Creating symbolic link to $GODOT_NAME.app in /Applications folder..."
-    sudo ln -s "$(pwd)/$GODOT_NAME.app" "$APP_LINK"
+    echo "Creating symbolic link to $GODOT_APP_NAME.app in /Applications folder..."
+    sudo ln -s "$(pwd)/$GODOT_APP_NAME.app" "$APP_LINK"
     check_error "Failed to create symbolic link in /Applications folder"
     echo "Symbolic link created successfully."
 else
@@ -184,5 +184,5 @@ else
 fi
 
 echo ""
-echo "Finished building $GODOT_NAME!"
+echo "Finished building $GODOT_APP_NAME!"
 echo "#######################"
