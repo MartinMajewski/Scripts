@@ -5,7 +5,7 @@
 
 # Variables
 GODOT_APP_NAME="Godot"
-GODOT_APP_ASSEMBLY_PATH="bin"
+GODOT_APP_ASSEMBLY_PATH="bin/app"
 PRECISION="double"
 MONO_ENABLED="no"
 VULKAN_ENABLED="no"
@@ -163,6 +163,8 @@ if [ -d "godot" ] && [ -d "godot/.git" ] && [[ "$(pwd)" != *"/godot"* ]]; then
         git pull --rebase origin master
         check_error "Failed to pull the latest changes from the Godot repository"
         echo "Godot repository updated to latest remote's master state."
+    else
+        echo "Building the currently checked out git Godot version."
     fi
 
 # Clone the Godot repository if it does not exist yet
@@ -182,9 +184,9 @@ if [ "$VULKAN_ENABLED" = "yes" ]; then
     echo ""
     # Check if Vulkan SDK is installed
     echo "-----------------------"
-    echo "Checking Vulkan SDK..."
-    ./misc/scripts/check_vulkan_sdk_macos.sh
-    check_error "Failed to check Vulkan SDK"
+    echo "Checking/installing Vulkan SDK..."
+    ./misc/scripts/install_vulkan_sdk_macos.sh
+    check_error "Failed to check/install Vulkan SDK"
 fi
 
 echo ""
@@ -227,6 +229,10 @@ echo ""
 # Package the Godot engine for MacOS
 echo "-----------------------"
 echo "Packaging $GODOT_APP_NAME for MacOS arm64..."
+
+# Create the bin/app directory if it does not exist
+mkdir -p $GODOT_APP_ASSEMBLY_PATH
+check_error "Failed to create $GODOT_APP_ASSEMBLY_PATH directory"
 
 echo "Removing old $GODOT_APP_NAME.app..."
 rm -rf $GODOT_APP_ASSEMBLY_PATH/$GODOT_APP_NAME.app
@@ -287,14 +293,26 @@ echo ""
 echo "-----------------------"
 FULL_GODOT_APP_NAME="$GODOT_APP_NAME-CustomBuild.app"
 APP_LINK="/Applications/$FULL_GODOT_APP_NAME"
-if [ ! -L "$APP_LINK" ]; then
-    echo "Creating symbolic link $GODOT_APP_ASSEMBLY_PATH/$FULL_GODOT_APP_NAME to $GODOT_APP_NAME.app in /Applications folder..."
-    sudo ln -s "$(pwd)/$GODOT_APP_ASSEMBLY_PATH/$GODOT_APP_NAME.app" "$APP_LINK"
-    check_error "Failed to create symbolic link in /Applications folder"
-    echo "Symbolic link created successfully."
-else
-    echo "Symbolic link already exists in /Applications folder."
+
+if [ -L "$APP_LINK" ]; then
+    echo "Removing existing symbolic link $APP_LINK..."
+    sudo rm "$APP_LINK"
+    check_error "Failed to remove existing symbolic link in /Applications folder"
 fi
+
+echo "Creating symbolic link $GODOT_APP_ASSEMBLY_PATH/$FULL_GODOT_APP_NAME to $GODOT_APP_NAME.app in /Applications folder..."
+sudo ln -s "$(pwd)/$GODOT_APP_ASSEMBLY_PATH/$GODOT_APP_NAME.app" "$APP_LINK"
+check_error "Failed to create symbolic link in /Applications folder"
+echo "Symbolic link created successfully."
+
+###################################################################################################
+echo ""
+# Cleaning up bin folder
+echo "-----------------------"
+echo "Cleaning up bin folder..."
+find bin -mindepth 1 -maxdepth 1 ! -name 'app' -exec rm -rf {} +
+check_error "Failed to clean up bin folder"
+echo "bin folder cleaned up successfully."
 
 ###################################################################################################
 echo ""
