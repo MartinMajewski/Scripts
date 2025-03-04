@@ -7,7 +7,7 @@
 GODOT_APP_NAME="Godot"
 GODOT_APP_ASSEMBLY_PATH="bin/app"
 PRECISION="double"
-MONO_ENABLED="no"
+DOTNET_ENABLED="no"
 VULKAN_ENABLED="no"
 BUILD_LATEST="no"
 
@@ -86,19 +86,19 @@ echo "1. Yes"
 echo "2. No"
 echo "========================================================"
 echo ""
-echo "Note: Building with DotNet/Mono support requires the Mono SDK to be installed."
+echo "Note: Building with DotNet support requires the DotNet SDK to be installed."
 echo ""
 read -p "Enter your choice (1 or 2): " choice
 
-# Set the MONO_ENABLED variable based on user input
+# Set the DOTNET_ENABLED variable based on user input
 if [ "$choice" -eq 1 ]; then
-    MONO_ENABLED="yes"
-    GODOT_APP_NAME="$GODOT_APP_NAME-Mono"
-    echo "Building Godot with DotNet/Mono support."
+    DOTNET_ENABLED="yes"
+    GODOT_APP_NAME="$GODOT_APP_NAME-DotNet"
+    echo "Building Godot with DotNet support."
 elif [ "$choice" -eq 2 ]; then
-    MONO_ENABLED="no"
+    DOTNET_ENABLED="no"
     GODOT_APP_NAME="$GODOT_APP_NAME"
-    echo "Building Godot without DotNet/Mono support."
+    echo "Building Godot without DotNet support."
 else
     echo "Invalid choice. Exiting."
     exit 1
@@ -138,7 +138,7 @@ echo "#######################"
 echo "Build Configuration:"
 echo "GODOT_APP_NAME: $GODOT_APP_NAME"
 echo "PRECISION: $PRECISION"
-echo "MONO_ENABLED: $MONO_ENABLED"
+echo "DotNet_ENABLED: $DOTNET_ENABLED"
 echo "VULKAN_ENABLED: $VULKAN_ENABLED"
 echo "#######################"
 echo ""
@@ -192,31 +192,31 @@ fi
 echo ""
 # Build the Godot engine for MacOS arm64
 echo "-----------------------"
-scons platform=macos arch=arm64 volk=$VULKAN_ENABLED module_mono_enabled=$MONO_ENABLED precision=$PRECISION
+scons platform=macos arch=arm64 volk=$VULKAN_ENABLED module_mono_enabled=$DOTNET_ENABLED precision=$PRECISION
 check_error "Failed to build the Godot engine"
 
 echo ""
 # Build export templates
 echo "-----------------------"
-scons platform=macos target=template_debug module_mono_enabled=$MONO_ENABLED precision=$PRECISION
+scons platform=macos target=template_debug module_mono_enabled=$DOTNET_ENABLED precision=$PRECISION
 check_error "Failed to build template_debug"
-scons platform=macos target=template_release module_mono_enabled=$MONO_ENABLED precision=$PRECISION
+scons platform=macos target=template_release module_mono_enabled=$DOTNET_ENABLED precision=$PRECISION
 check_error "Failed to build template_release"
 
 # Print compile completion message
 echo "$GODOT_APP_NAME build for MacOS arm64 completed successfully."
 
-if [ "$MONO_ENABLED" = "yes" ]; then
+if [ "$DOTNET_ENABLED" = "yes" ]; then
     echo ""
-    # Generate Mono Glue
+    # Generate dotnet Glue
     echo "-----------------------"
-    echo "Generating Mono Glue..."
+    echo "Generating dotnet Glue..."
     if [ "$PRECISION" = "double" ]; then
         bin/godot.macos.editor.double.arm64.mono --headless --generate-mono-glue modules/mono/glue
     else
         bin/godot.macos.editor.arm64.mono --headless --generate-mono-glue modules/mono/glue
     fi
-    check_error "Failed to generate Mono Glue"
+    check_error "Failed to generate DotNet Glue"
 
     echo ""
     # Build Managed Libraries
@@ -250,7 +250,7 @@ check_error "Failed to create Contents/MacOS directory"
 
 echo ""
 echo "Copying $GODOT_Name binary to $GODOT_APP_ASSEMBLY_PATH/$GODOT_APP_NAME.app/Contents/MacOS/..."
-if [ "$MONO_ENABLED" = "yes" ]; then
+if [ "$DOTNET_ENABLED" = "yes" ]; then
     if [ "$PRECISION" = "double" ]; then
         cp bin/godot.macos.editor.double.arm64.mono $GODOT_APP_ASSEMBLY_PATH/$GODOT_APP_NAME.app/Contents/MacOS/Godot
     else
